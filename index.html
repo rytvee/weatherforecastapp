@@ -1,100 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(to right, #743bd5, #d6b025);
-            color: #333;
-            text-align: center;
-            padding: 50px;
-        }
-        input[type="text"] {
-            padding: 10px;
-            width: 250px;
-            border: none;
-            border-radius: 5px;
-            margin-bottom: 5px;
-        }
-        button {
-            padding: 10px 15px;
-            border: none;
-            background-color: #333;
-            color: #fff;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #555;
-        }
-        #weather {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            display: inline-block;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Specific Date Weather Forecast</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #743bd5, #d6b025);
+      text-align: center;
+      padding: 40px;
+      color: #fff;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+      border: none;
+    }
+    #weather {
+      background-color: #fff;
+      color: #333;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+  </style>
 </head>
 <body>
-    <h1>5-Day Weather Forecast</h1>
-    <form action="" id="weatherForm">
-        <input type="text" id="cityInput" placeholder="Enter city name" required>
-        <button type="submit">Get Forecast</button>
-    </form>
-    <div id="weather"></div>
+  <h1>Forecast for a Specific Date</h1>
+  <form id="weatherForm">
+    <input type="text" id="cityInput" placeholder="Enter city" required />
+    <input type="date" id="dateInput" required />
+    <button type="submit">Get Forecast</button>
+  </form>
+  <div id="weather"></div>
 
-    <script>
-        const form = document.getElementById("weatherForm");
-        const cityInput = document.getElementById("cityInput");
-        const weatherDiv = document.getElementById("weather");
-        const API_KEY = "7a08d1b142b94e5eab474229250907" // your weatherAPI Key
+  <script>
+    const API_KEY = "7a08d1b142b94e5eab474229250907"; // Your API key
+    const form = document.getElementById("weatherForm");
+    const weatherDiv = document.getElementById("weather");
 
-        form.addEventListener("submit", function(e) {
-            e.preventDefault();
-            const city = cityInput.value.trim();
+    // Set min and max date to today and 10 days ahead
+    const dateInput = document.getElementById("dateInput");
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 10);
 
-            if (city === "") return;
+    // Format to yyyy-mm-dd
+    function formatDate(date) {
+        return date.toISOString().split('T')[0];
+    }
 
-            fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${city}&days=5`)
-                .then(response => {
-                    if (!response.ok) throw new Error("City not found");
-                    return response.json();
-                })
-                .then(data => {
-                    const location = `${data.location.name}, ${data.location.country}`;
-                    const current = data.current;
-                    const forecast = data.forecast.forecastday;
-                    
-                    let html = `
-                        <h2>${location}</h2>
-                        <img src="https:${current.condition.icon}" alt="${current.condition.text}"/>
-                        <p><strong>Current Temp: </strong> ${current.temp_c}°C</p>
-                        <p><strong>Condition: </strong> ${current.condition.text}</p>
-                        <h3>5-Day Forecast</h3>
-                    `;
-                    forecast.forEach(day => {
-                        html += `
-                            <div>
-                                <p><strong>${day.date}</strong></p>
-                                <img src="https:${day.day.condition.icon}" alt="${day.day.condition.text}"/>
-                                <p>${day.day.condition.text}</p>
-                                <p>Max: ${day.day.maxtemp_c}°C | Min: ${day.day.mintemp_c}°C</p>
-                            </div>
-                        `;
-                    });
-                    weatherDiv.innerHTML = html;
-                })
-                .catch(error => {
-                    weatherDiv.innerHTML = `
-                        <p style="color:red";>${error.message}</p>
-                    `;
-                });
+    dateInput.min = formatDate(today);
+    dateInput.max = formatDate(maxDate);
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const city = document.getElementById("cityInput").value.trim();
+      const targetDate = document.getElementById("dateInput").value;
+
+      if (!city || !targetDate) return;
+
+      // Calculate how many days ahead the selected date is
+      const today = new Date();
+      const selected = new Date(targetDate);
+      const diffTime = selected.getTime() - today.getTime();
+      const daysAhead = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (daysAhead < 0 || daysAhead > 10) {
+        weatherDiv.innerHTML = `<p style="color:red;">Please choose a date within the next 10 days.</p>`;
+        return;
+      }
+
+      fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${city}&days=${daysAhead + 1}`)
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to fetch forecast");
+          return res.json();
+        })
+        .then(data => {
+          const dayData = data.forecast.forecastday.find(day => day.date === targetDate);
+          if (!dayData) {
+            weatherDiv.innerHTML = `<p style="color:red;">No forecast available for the selected date.</p>`;
+            return;
+          }
+
+          const html = `
+            <h2>${data.location.name}, ${data.location.country}</h2>
+            <h3>${dayData.date}</h3>
+            <img src="https:${dayData.day.condition.icon}" alt="${dayData.day.condition.text}">
+            <p><strong>Condition:</strong> ${dayData.day.condition.text}</p>
+            <p><strong>Max Temp:</strong> ${dayData.day.maxtemp_c}°C</p>
+            <p><strong>Min Temp:</strong> ${dayData.day.mintemp_c}°C</p>
+          `;
+          weatherDiv.innerHTML = html;
+        })
+        .catch(err => {
+          weatherDiv.innerHTML = `<p style="color:red;">${err.message}</p>`;
         });
-    </script>
+    });
+  </script>
 </body>
 </html>
