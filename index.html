@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(to right, #743bd5, #d6b025);
+            color: #333;
+            text-align: center;
+            padding: 50px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 250px;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        #weather {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <h1>5-Day Weather Forecast</h1>
+    <form action="" id="weatherForm">
+        <input type="text" id="cityInput" placeholder="Enter city name" required>
+        <button type="submit">Get Forecast</button>
+    </form>
+    <div id="weather"></div>
+
+    <script>
+        const form = document.getElementById("weatherForm");
+        const cityInput = document.getElementById("cityInput");
+        const weatherDiv = document.getElementById("weather");
+        const API_KEY = "7a08d1b142b94e5eab474229250907" // your weatherAPI Key
+
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+            const city = cityInput.value.trim();
+
+            if (city === "") return;
+
+            fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${city}&days=5`)
+                .then(response => {
+                    if (!response.ok) throw new Error("City not found");
+                    return response.json();
+                })
+                .then(data => {
+                    const location = `${data.location.name}, ${data.location.country}`;
+                    const current = data.current;
+                    const forecast = data.forecast.forecastday;
+                    
+                    let html = `
+                        <h2>${location}</h2>
+                        <img src="https:${current.condition.icon}" alt="${current.condition.text}"/>
+                        <p><strong>Current Temp: </strong> ${current.temp_c}°C</p>
+                        <p><strong>Condition: </strong> ${current.condition.text}</p>
+                        <h3>5-Day Forecast</h3>
+                    `;
+                    forecast.forEach(day => {
+                        html += `
+                            <div>
+                                <p><strong>${day.date}</strong></p>
+                                <img src="https:${day.day.condition.icon}" alt="${day.day.condition.text}"/>
+                                <p>${day.day.condition.text}</p>
+                                <p>Max: ${day.day.maxtemp_c}°C | Min: ${day.day.mintemp_c}°C</p>
+                            </div>
+                        `;
+                    });
+                    weatherDiv.innerHTML = html;
+                })
+                .catch(error => {
+                    weatherDiv.innerHTML = `
+                        <p style="color:red";>${error.message}</p>
+                    `;
+                });
+        });
+    </script>
+</body>
+</html>
