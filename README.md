@@ -1,6 +1,6 @@
-# tic-tac-toe Game
+# weatherapp
 
-A simpe browser-based tic-tac-toe game built with HTML and JavaScript.
+A simpe browser-based weather forecast app built with HTML, JavaScript and WeatherAPI
 
 
 ## Demo
