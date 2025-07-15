@@ -2,9 +2,6 @@
 
 A simpe browser-based tic-tac-toe game built with HTML and JavaScript.
 
-## Features
-
-- 
 
 ## Demo
 
