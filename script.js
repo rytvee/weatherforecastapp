@@ -1,4 +1,4 @@
-const API_KEY = "7a08d1b142b94e5eab474229250907"; // Replace with your actual API key
+const API_KEY = ""; // Replace with your actual API key
 const form = document.getElementById("weatherForm");
 const weatherDiv = document.getElementById("weather");
 
