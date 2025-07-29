@@ -34,7 +34,7 @@ form.addEventListener("submit", function (e) {
   }
 
   // Replace with your actual Vercel URL
-  const apiBaseUrl = "https://weather-api-proxy-zeta.vercel.app/";
+  const apiBaseUrl = "https://weather-api-proxy-zeta.vercel.app";
 
   fetch(`${apiBaseUrl}/api/forecast?city=${encodeURIComponent(city)}&days=${daysAhead + 1}`)
     .then(res => {
