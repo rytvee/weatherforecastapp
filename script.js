@@ -60,6 +60,7 @@ form.addEventListener("submit", function (e) {
       weatherDiv.style.display = "block";
     })
     .catch(err => {
+      console.error("Error:", err);
       weatherDiv.innerHTML = `<p style="color:red;">${err.message}</p>`;
       weatherDiv.style.display = "block";
     });
