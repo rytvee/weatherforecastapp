@@ -4,30 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Weather Forecast App</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #743bd5, #d6b025);
-      text-align: center;
-      padding: 40px;
-      color: #fff;
-    }
-    input, button {
-      padding: 10px;
-      margin: 5px;
-      border-radius: 5px;
-      border: none;
-    }
-    #weather {
-      background-color: #fff;
-      color: #333;
-      padding: 20px;
-      margin-top: 20px;
-      border-radius: 10px;
-      display: inline-block;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <h1>Forecast for a Specific Date</h1>
@@ -36,9 +13,9 @@
     <input type="date" id="dateInput" required />
     <button type="submit">Get Forecast</button>
   </form>
+
   <div id="weather"></div>
 
-  <!-- Link to external JavaScript file -->
   <script src="script.js"></script>
 </body>
 </html>
